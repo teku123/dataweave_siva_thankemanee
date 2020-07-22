@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<types:mule xmlns:types="http://www.mulesoft.org/schema/mule/types">
+  <types:catalog>
+    <types:type name="Dw_Json" format="json">
+      <types:shape format="weave" example="examples/Json-dwSample"><![CDATA[%dw 2.0
+
+type Dw_Json = {|
+  employees: Array<{|    firstName: String,     lastName: String,     age: Number {"typeId": "int"}  |}>
+|} {"example": "{\\\"employees\\\":[{\\\"firstName\\\":\\\"John\\\",\\\"lastName\\\":\\\"Doe\\\",\\\"age\\\":25},{\\\"firstName\\\":\\\"Anna\\\",\\\"lastName\\\":\\\"Smith\\\",\\\"age\\\":15},{\\\"firstName\\\":\\\"Peter\\\",\\\"lastName\\\":\\\"Jones\\\",\\\"age\\\":35},{\\\"firstName\\\":\\\"Haymi\\\",\\\"lastName\\\":\\\"Belay\\\",\\\"age\\\":20},{\\\"firstName\\\":\\\"Ahadu\\\",\\\"lastName\\\":\\\"Geta\\\",\\\"age\\\":40},{\\\"firstName\\\":\\\"Zeab\\\",\\\"lastName\\\":\\\"Haymen\\\",\\\"age\\\":65}]}"}
+
+]]></types:shape>
+    </types:type>
+  </types:catalog>
+  <types:enrichment select="#3378dc78-bfed-4e5c-b9e2-e5887732f53c">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Dw_Json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+  <types:enrichment select="#f7e99183-14ce-40ea-9628-aba85d935944">
+    <types:processor-declaration>
+      <types:output-event>
+        <types:message>
+          <types:payload type="Dw_Json"/>
+        </types:message>
+      </types:output-event>
+    </types:processor-declaration>
+  </types:enrichment>
+</types:mule>

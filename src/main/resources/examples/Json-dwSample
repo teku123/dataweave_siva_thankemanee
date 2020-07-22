@@ -1,0 +1,34 @@
+{
+	"employees": [
+		{
+			"firstName": "John",
+			"lastName": "Doe",
+			"age": 25
+		},
+		{
+			"firstName": "Anna",
+			"lastName": "Smith",
+			"age": 15
+		},
+		{
+			"firstName": "Peter",
+			"lastName": "Jones",
+			"age": 35
+		},
+		{
+			"firstName": "Haymi",
+			"lastName": "Belay",
+			"age": 20
+		},
+		{
+			"firstName": "Ahadu",
+			"lastName": "Geta",
+			"age": 40
+		},
+		{
+			"firstName": "Zeab",
+			"lastName": "Haymen",
+			"age": 65
+		}
+	]
+}

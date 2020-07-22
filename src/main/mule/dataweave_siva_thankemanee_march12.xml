@@ -1,0 +1,151 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b6622842-281b-4587-960c-3f8b8108ed0a" >
+		<http:listener-connection host="0.0.0.0" port="8089" />
+	</http:listener-config>
+	<http:listener-config name="HTTP_Listener_config1" doc:name="HTTP Listener config" doc:id="5ceef782-0992-4c56-ae10-fa5300977d3e" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="dataweave_siva_thankemanee_march12Flow" doc:id="b9705f58-8258-4cc4-b75a-78ddabda7304" >
+		<http:listener doc:name="Listener" doc:id="41a759a7-bbae-44c6-89e3-7ede1dd0c1fb" config-ref="HTTP_Listener_config" path="/transform"/>
+		<logger level="INFO" doc:name="Logger" doc:id="e2185f4b-b74b-4f18-9fdd-40597d955a1c" message="'Transforming different messages'"/>
+		<ee:transform doc:name="Map-Operator" doc:id="affd1360-f456-489b-ab8f-43e4a398710b" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+Books:{
+	Book:payload.bookstore.*book map (data, index) ->
+	{
+		name: data.title,
+		author: data.author,
+		year:data.year,
+		price:data.price
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="DistinctBy removes duplicates" doc:id="19b82b57-bdcf-4f16-9665-e25924147d4a" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+Books:{
+	Book:payload.bookstore.*book distinctBy $ map (data, index) ->
+	{
+		name: data.title,
+		author: data.author,
+		year:data.year,
+		price:data.price
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="orderBy, Sorts an array using the specified criteria" doc:id="fce55224-3732-4658-8736-038be4dbe352" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+Books:{
+	Book:payload.bookstore.*book distinctBy $ map ((data, index) ->
+	{
+		name: data.title,
+		author: data.author,
+		cost:data.price,
+		year:data.year
+	}) orderBy $.year
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Filter used to filter array based on certain criteria." doc:id="72de0286-266d-4a0a-8df6-740d1975c150" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+Books:{
+	Book:payload.bookstore.*book filter ($.book>2003) distinctBy $ map ((data, index) ->
+	{
+		name: data.title,
+		author: data.author,
+		cost:data.price,
+		year:data.year
+	}) orderBy $.name
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="Transform Message" doc:id="d6d9e8ce-face-4036-bbfc-e5f7e671b602" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+
+---
+Books:{
+	Book:payload.bookstore.*book filter ($.book>2003) distinctBy $ map ((data, index) ->
+	{
+		name: data.title,
+		author: data.author,
+		cost:data.price,
+		year:data.year
+	}) orderBy $.name,
+	total:payload.bookstore.*book filter ($.book>2003)  reduce ((bk,sum=0) -> sum+bk.price)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<set-payload value="#[payload]" doc:name="Set Payload" doc:id="0a9f20ad-0cde-4ede-adfb-2c6615c8a512" />
+	</flow>
+	<flow name="dataweave_siva_thankemanee_march12Flow1" doc:id="aa841f90-3625-4289-a558-0fd71daf9502" >
+		<http:listener doc:name="Listener" doc:id="3378dc78-bfed-4e5c-b9e2-e5887732f53c" config-ref="HTTP_Listener_config1" path="/dataweave"/>
+		<logger level="INFO" doc:name="Logger" doc:id="6fc5afe8-d242-4f21-a691-313842a41b5d" message="#['advanced dataweave practice']"/>
+		<ee:transform doc:name="MapObject" doc:id="f7e99183-14ce-40ea-9628-aba85d935944" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	employees: payload.employees map ( employee , indexOfEmployee ) -> {
+		firstName: employee.firstName,
+		lastName: employee.lastName,
+		age: employee.age
+	}
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="orderBy" doc:id="01c4efe0-38b4-4ff8-a876-a8b6363febd9" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	employees: payload.employees map (( employee , indexOfEmployee ) -> {
+		firstName: employee.firstName,
+		lastName: employee.lastName,
+		age: employee.age
+	}) orderBy $.age
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ee:transform doc:name="orderBy using contacnate" doc:id="517302fa-8f0e-4bcd-8358-49ce4d7860aa" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	employees: payload.employees map (( employee , indexOfEmployee ) -> {
+		firstName: employee.firstName,
+		lastName: employee.lastName,
+		age: employee.age
+	}) orderBy ($.firstName ++ $.lastName)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
